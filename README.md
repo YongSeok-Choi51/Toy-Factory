@@ -1,2 +1,7 @@
-# Toy-Factory
-Daily PlayGround
+# 정규표현식 (Part II)
+
+## 학습 범위
+- 레퍼런스 사이트 기준 (Lookaround ~ Flags)
+
+## 이해가 가지 않거나 확장해서 궁금해진 점!
+ - 
