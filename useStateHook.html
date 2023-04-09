@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Vanila-React</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <div id="app"></div>
+        <script>
+            let state
+              // useState 내부에서 선언해 사용하면,
+            // render 함수가 실행이 될 떄마다 초기화 되기떄문에
+            // 함수 밖에서 선언이 되고 사용되게 된다.
+
+            const useState = (initState) => {
+                if(state === undefined) {
+                    state = initState
+                }
+                const setState  = (newState) => {
+                    state = newState
+                    render()
+                }
+                return [state, setState]    
+                
+            }
+
+            let lenderCount = 0
+            const render = () => {
+                app.innerHTML = `
+                <div>rederCount:${lenderCount}</div>
+                ${Counter()}
+                `
+                lenderCount +=1
+            }
+
+            const Counter = () => {
+                const [count, setCount] = useState(1)
+                window.increment = () => setCount(count+1)
+                return `
+                    <div>
+                        <strong>count: ${count}</strong>
+                        <button onclick="increment()">더하기</button>
+                    </div>
+                `           
+            }
+            render()
+        </script>
+    </body>
+</html>
