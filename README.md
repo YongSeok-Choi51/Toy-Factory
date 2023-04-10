@@ -5,4 +5,6 @@
  - 리액트의 useState가 왜 비동기로 동작할까? 동기적으로 동작하게 하려면 어떻게 해야할까?
 
 
-
+#### Reference
+ - https://junilhwang.github.io/TIL/Javascript/Design/Vanilla-JS-Make-useSate-hook/#_2-bottom-up-%E1%84%87%E1%85%AE%E1%86%AB%E1%84%89%E1%85%A5%E1%86%A8
+ - https://velog.io/@aborile/React-Hooks-with-Vanilla-JavaScript
