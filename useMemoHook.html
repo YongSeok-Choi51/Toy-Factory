@@ -8,19 +8,53 @@
     <div id="useMemoApp"></div>
     <script>
 
-
-        let dependencyArray = [];
+        let useEffectDependencyArr = [];
         let states = [];
         let useStateCallCount = 0;
+        let useMemoDependencyArr = []
+        let memoization
 
-        const useMemo = (callback, dependencyArray) => {
+        const useMemo = (callback, inputDependencyArray) => {
 
+            if(useMemoDependencyArr.length === 0 && inputDependencyArray.length > 1) {
+                useMemoDependencyArr = [...inputDependencyArray]
+                memoization = callback()
+                return memoization
+            } else {
+                const changedIdxList = [];
+                const changed = inputDependencyArray.filter((e, idx) => {
+                    if (typeof e === "object") {
+                        if (!Object.is(e, useMemoDependencyArr[idx])) { // 변경감지
+                            changedIdxList.push(idx);
+                            return true;
+                        }
+                        return false;
+                    } else {
+                        if (e !== useMemoDependencyArr[idx]) {
+                            changedIdxList.push(idx);
+                            return true;
+                        }
+                        return false;
+                    }
+
+                });
+                if (changed.length > 0) {
+                    memoization = callback()
+                } else {
+                    return memoization
+                }
+
+                changedIdxList.forEach(changedIdx => { // 새로운 값을 의존하는 배열로 갱신
+                    useMemoDependencyArr[changedIdx] = inputDependencyArray[changedIdx];
+                });
+                return memoization
+            }
         };
 
         const useState = (initialValue) => {
 
             const key = useStateCallCount;
-            if (dependencyArray.length == key) {
+            if (states.length === key) {
                 states.push(initialValue);
             }
 
@@ -33,22 +67,22 @@
             return [state, setState];
         };
 
-        const useEffect = (callback, dependency) => {
+        const useEffect = (callback, inputDependencyArray) => {
 
             const changedIdxList = [];
-            if (dependencyArray.length === 0 && dependency.length > 0) {
-                dependencyArray = [...dependency];
+            if (useEffectDependencyArr.length === 0 && inputDependencyArray.length > 0) {
+                useEffectDependencyArr = [...inputDependencyArray];
             } else {
 
-                const changed = dependencyArray.filter((e, idx) => {
+                const changed = useEffectDependencyArr.filter((e, idx) => {
                     if (typeof e === "object") {
-                        if (!Object.is(e, dependencyArray[idx])) { // 변경감지
+                        if (!Object.is(e, useEffectDependencyArr[idx])) { // 변경감지
                             changedIdxList.push(idx);
                             return true;
                         }
                         return false;
                     } else {
-                        if (e !== dependencyArray[idx]) {
+                        if (e !== useEffectDependencyArr[idx]) {
                             changedIdxList.push(idx);
                             return true;
                         }
@@ -59,8 +93,8 @@
                 if (changed.length > 0) {
                     callback();
                 }
-                changedIdxList.forEach(changedIdx => {
-                    dependencyArray[changedIdx] = dependency[changedIdx];
+                changedIdxList.forEach(changedIdx => { // 새로운 값을 의존하는 배열로 갱신
+                    useEffectDependencyArr[changedIdx] = inputDependencyArray[changedIdx];
                 });
             }
         };
@@ -70,15 +104,14 @@
             const [str, setStr] = useState("first");
 
             window.incrementNum = () => setNumber(number + 1);
-            window.concatStr = () => setStr(" again!");
+            window.concatStr = () => setStr(str+" again!");
 
-            const twoValues = useMemo(() => {
-
-            }, [number]);
+            const twoValues = useMemo(() => str + " " + number, [number]);
 
             return `
-                <div><button onclick="incrementCnt()">카운터증가</button><br/><b>${number}<b/></div>
-                    <div><button onclick="addName()">이름 중가</button><br/><b>${str}<b/></di
+                <div><button onclick="incrementNum()">카운터증가</button><br/><b>${number}<b/></div>
+                    <div><button onclick="concatStr()">이름 증가</button><br/><b>${str}<b/></div>
+                    <div>memorized Value = ${twoValues}</div>
             `;
 
         };
@@ -88,9 +121,11 @@
                 <h1>useMemo In Javascript</h1>
                 ${useMemo컴포넌트()}
             `;
+            useStateCallCount = 0
 
         }
 
+        render()
     </script>
 
 </body>
