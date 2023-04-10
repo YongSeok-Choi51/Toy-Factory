@@ -1,0 +1,106 @@
+<html>
+
+<head>
+    <title>자바스크립트로 useEffect구현하기</title>
+</head>
+
+<body>
+    <div id="ysApp"></div>
+
+    <script>
+
+        let dependencyArr = [];
+        let states = [];
+        let useStateCallCnt = 0;
+
+        const useEffect = (callback, dependencies) => {
+            const changedIdx = [];
+
+            if (dependencies && dependencies.length > 0 && dependencyArr.length === 0) { // 초기 initialize
+                dependencyArr = dependencies.map(e => e);
+                console.log('initial values ', dependencyArr);
+            } else {
+                const isChange = dependencies && dependencies.filter((e, idx) => {
+                    console.log('e, dependencyArr[idx] -> ', e, dependencyArr[idx]);
+                    if (typeof e === "object" || typeof e === "function") {  // useEffect는 객체 동등성으로 비교, 즉 ref compare
+
+                        if (!Object.is(e, dependencyArr[idx])) {
+                            changedIdx.push(idx);
+                            return true;
+                        }
+                        return false;
+
+                    } else { // when it's primitive type
+                        if (e !== dependencyArr[idx]) {
+                            changedIdx.push(idx);
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+                if (isChange && isChange.length > 0) { //변경 감지!
+                    callback();
+                }
+
+                changedIdx.forEach(idx => {
+                    dependencyArr[idx] = dependencies[idx]; // 새롭게 갱신된 new useEffect dependency array
+                });
+                // console.log('chagnged deps ', dependencyArr);
+            }
+
+        };
+
+        const useState = (initValue) => {
+
+            const key = useStateCallCnt;
+            if (states.length === key) {
+                states.push(initValue);
+            }
+            const state = states[key];
+            const setState = (newValue) => {
+                states[key] = newValue;
+                render();
+            };
+            useStateCallCnt += 1;
+            return [state, setState];
+        };
+
+        const 최용석의컴포넌트 = () => {
+            const [count, setCount] = useState(1);
+            const [name, setName] = useState("최");
+
+            useEffect(() => {
+                console.log("Effect Called");
+                alert("변경감지!!");
+                console.log("changed Value ", count, name);
+            }, [count, name]);
+
+            window.incrementCnt = () => setCount(count + 1);
+            window.addName = () => setName(name + " 용");
+
+            return (
+                `
+                    <div><button onclick="incrementCnt()">카운터증가</button><br/><b>${count}<b/></div>
+                    <div><button onclick="addName()">이름 중가</button><br/><b>${name}<b/></div>
+
+                `
+            );
+
+        };
+
+        const render = () => {
+
+            ysApp.innerHTML = `
+            <h1>Effect Tester</h1>
+            ${최용석의컴포넌트()}
+            `;
+            useStateCallCnt = 0;
+        };
+
+        render()
+    </script>
+
+</body>
+
+</html>
