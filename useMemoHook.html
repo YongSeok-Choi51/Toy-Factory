@@ -1,0 +1,98 @@
+<html>
+
+<head>
+    <title>useMemo in Javascript</title>
+</head>
+
+<body>
+    <div id="useMemoApp"></div>
+    <script>
+
+
+        let dependencyArray = [];
+        let states = [];
+        let useStateCallCount = 0;
+
+        const useMemo = (callback, dependencyArray) => {
+
+        };
+
+        const useState = (initialValue) => {
+
+            const key = useStateCallCount;
+            if (dependencyArray.length == key) {
+                states.push(initialValue);
+            }
+
+            const state = states[key];
+            const setState = (newValue) => {
+                states[key] = newValue;
+                render();
+            };
+            useStateCallCount += 1;
+            return [state, setState];
+        };
+
+        const useEffect = (callback, dependency) => {
+
+            const changedIdxList = [];
+            if (dependencyArray.length === 0 && dependency.length > 0) {
+                dependencyArray = [...dependency];
+            } else {
+
+                const changed = dependencyArray.filter((e, idx) => {
+                    if (typeof e === "object") {
+                        if (!Object.is(e, dependencyArray[idx])) { // 변경감지
+                            changedIdxList.push(idx);
+                            return true;
+                        }
+                        return false;
+                    } else {
+                        if (e !== dependencyArray[idx]) {
+                            changedIdxList.push(idx);
+                            return true;
+                        }
+                        return false;
+                    }
+
+                });
+                if (changed.length > 0) {
+                    callback();
+                }
+                changedIdxList.forEach(changedIdx => {
+                    dependencyArray[changedIdx] = dependency[changedIdx];
+                });
+            }
+        };
+
+        const useMemo컴포넌트 = () => {
+            const [number, setNumber] = useState(0);
+            const [str, setStr] = useState("first");
+
+            window.incrementNum = () => setNumber(number + 1);
+            window.concatStr = () => setStr(" again!");
+
+            const twoValues = useMemo(() => {
+
+            }, [number]);
+
+            return `
+                <div><button onclick="incrementCnt()">카운터증가</button><br/><b>${number}<b/></div>
+                    <div><button onclick="addName()">이름 중가</button><br/><b>${str}<b/></di
+            `;
+
+        };
+
+        const render = () => {
+            useMemoApp.innerHTML = `
+                <h1>useMemo In Javascript</h1>
+                ${useMemo컴포넌트()}
+            `;
+
+        }
+
+    </script>
+
+</body>
+
+</html>
