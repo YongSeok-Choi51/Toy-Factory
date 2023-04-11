@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Vanila-React</title>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <div id="app"></div>
+    <script>
+
+        // useState함수 하나로 여러 컴포넌트의 상태를 관리하는 방법?
+        // 함수가 호출된 횟수를 유지하고, 
+
+        let states = [];
+        let useStateCount = 0;
+        const useState = (initState) => {
+
+            const key = useStateCount;
+            if (states.length === key) {
+                states.push(initState);
+            }
+
+            const state = states[key];
+            // 함수가 반환이 될 때 이미 타깃 상수값을 바꾸는 함수를 반환한다!
+            const setState = (newState) => {
+                console.log('key, state', key, newState);
+                states[key] = newState;
+                render();
+            };
+            useStateCount += 1;
+            // console.log(states);
+            // console.log('useStateCount', useStateCount);
+            return [state, setState];
+        };
+
+        let lenderCount = 0;
+        const render = () => {
+            app.innerHTML = `
+                <div>rederCount:${lenderCount}</div>
+                <div>useStateCall:${useStateCount}</div>
+                <div>states.length:${states.length}</div>
+                ${Counter()}
+                ${Bark()}
+                `;
+            console.log("rendered.");
+            lenderCount += 1;
+            useStateCount = 0;
+        };
+
+        const Bark = () => {
+            const [bark, setBark] = useState("기본값");
+            window.bark = () => setBark(bark + "멍!");
+
+            return `
+                    <div>
+                        <b>고양이 ${bark}</b>
+                        <button onclick="bark()">dog</button>
+                    </div>
+                `;
+        };
+
+        const Counter = () => {
+            const [count, setCount] = useState(1);
+            window.increment = () => setCount(count + 1);
+            return `
+                    <div>
+                        <strong>count: ${count}</strong>
+                        <button onclick="increment()">더하기</button>
+                    </div>
+                `;
+        };
+        render()
+    </script>
+</body>
+
+</html>
