@@ -1,0 +1,79 @@
+<html>
+
+<head>
+
+</head>
+
+<body>
+    <div id="myApp"> </div>;
+    <script>
+        // const testJsx = <h1>이게 과연 가능할까요?</h1>; 불가능
+        const MyComponent = (owner) => {
+            console.log("component owner ", owner);
+            return `
+                <div>
+                    Is this Jsx Syntax?<br/>
+                    the component owner is ${owner}
+                </div>
+            `;
+        };
+
+        class CmyComponent {
+
+            constructor() {
+                this.name = '최용석';
+                this.age = 19;
+            }
+
+            setName = (argName) => {
+                this.name = argName;
+                this.render();
+            };
+
+            setAge = (argAge) => {
+                ths.age = argAge;
+                this.render();
+            };
+
+            getName = () => {
+                return this.name;
+            };
+
+            getAge = () => {
+                return this.age;
+            };
+
+            componentDidMount = () => {
+                console.log('컴포넌트가 방금 나타났습니다!');
+            };
+
+            componentWillUnMounted = () => {
+                console.log('컴포넌트가 곧 사라집니다.');
+                myApp.innerHTML = undefined;
+            };
+
+            render = () => {
+                this.componentWillUnMounted();
+                myApp.innerHTML = `<h3>this is Class component</h3>
+                <div>
+                    my name is ${this.getName()}<br/>
+                    my age is ${this.getAge()}
+                </div>
+                `;
+                this.componentDidMount();
+            };
+
+        }
+
+        const render = () => {
+            myApp.innerHTML = MyComponent("최용석");
+        };
+
+        // render()
+        const myClass = new CmyComponent();
+        myClass.render()
+    </script>
+
+</body>
+
+</html>
